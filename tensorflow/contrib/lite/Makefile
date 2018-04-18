@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 # Find where we're running from, so we can store generated files here.
 ifeq ($(origin MAKEFILE_DIR), undefined)
 	MAKEFILE_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -44,6 +46,12 @@ INCLUDES := \
 -I$(MAKEFILE_DIR)/downloads/farmhash/src \
 -I$(MAKEFILE_DIR)/downloads/flatbuffers/include \
 -I$(GENDIR)
+
+ifeq ($(TARGET), ANDROID)
+INCLUDE += \
+-I$(MAKEFILE_DIR)/downloads/abel
+endif
+
 # This is at the end so any globally-installed frameworks like protobuf don't
 # override local versions in the source tree.
 INCLUDES += -I/usr/local/include
@@ -61,6 +69,7 @@ endif
 
 include $(MAKEFILE_DIR)/ios_makefile.inc
 include $(MAKEFILE_DIR)/rpi_makefile.inc
+include $(MAKEFILE_DIR)/android_makefile.inc
 
 # This library is the main target for this makefile. It will contain a minimal
 # runtime that can be linked in to other programs.
@@ -118,8 +127,11 @@ $(OBJDIR)%.o: %.c
 	$(CC) $(CCFLAGS) $(INCLUDES) -c $< -o $@
 
 # The target that's compiled if there's no command-line arguments.
+ifneq ($(TARGET), ANDROID)
 all: $(LIB_PATH)  $(MINIMAL_PATH)
-
+else
+all: $(LIB_PATH)
+endif
 # Gathers together all the objects we've compiled into a single '.a' archive.
 $(LIB_PATH): $(LIB_OBJS)
 	@mkdir -p $(dir $@)
@@ -146,3 +158,8 @@ $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
 
 -include $(patsubst %,$(DEPDIR)/%.d,$(basename $(TF_CC_SRCS)))
+
+ifdef SUB_MAKEFILES
+$(warning "include sub makefiles, must not contain white spaces in the path:" $(SUB_MAKEFILES))
+include $(SUB_MAKEFILES)
+endif
