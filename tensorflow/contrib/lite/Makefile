@@ -218,7 +218,7 @@ $(OBJDIR)%.o: %.c
 
 # The target that's compiled if there's no command-line arguments.
 ifneq ($(TARGET), ANDROID)
-all: $(LIB_PATH)  $(MINIMAL_PATH) $(BENCHMARK_BINARY) $(BENCHMARK_BINARY)
+all: $(LIB_PATH)  $(MINIMAL_PATH) # $(BENCHMARK_BINARY)
 else
 all: $(LIB_PATH)
 endif

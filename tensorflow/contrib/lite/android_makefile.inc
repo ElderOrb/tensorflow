@@ -1,6 +1,7 @@
 # Settings for Android.
 ifeq ($(TARGET), ANDROID)
-	HOST_ARCH = $(ARCH)
+#	HOST_ARCH = $(ARCH)
+    $(info ************  $(HOST_ARCH) - $(HOST_OS) ************)
 
 	#If ANDROID_TYPES is not set assume __ANDROID_TYPES_SLIM__
 	ifeq ($(ANDROID_TYPES), )
